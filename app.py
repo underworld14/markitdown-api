@@ -15,25 +15,74 @@ app = FastAPI(
     description="API endpoint to extract text and convert it to markdown, using MarkItDown (https://github.com/microsoft/markitdown).",
 )
 
-ALLOWED_EXTENSIONS = {
-    "doc",
-    "docx",
-    "ppt",
-    "pptx",
-    "pdf",
-    "xls",
-    "xlsx",
-    # "odt",
-    # "ods",
-    # "odp",
-    "txt",
-    "csv",
-    "json"
-}
+
+FORBIDDEN_EXTENSIONS = [
+    # Executable and Script Files (Security Risk)
+    "exe",
+    "msi",
+    "bat",
+    "cmd",  # Windows
+    "dmg",
+    "pkg",
+    "app",  # macOS
+    "bin",
+    "sh",
+    "run",  # Linux/Unix
+    "dll",
+    "so",
+    "dylib",  # Dynamic libraries
+    "jar",
+    "apk",  # Java/Android packages
+    "vbs",
+    "ps1",  # Windows scripting
+    "pyc",
+    "pyo",  # Compiled Python
+    # System and Configuration Files
+    "sys",
+    "drv",  # System and driver files
+    "config",
+    "ini",  # Configuration files
+    # Binary Data Files
+    "dat",
+    "bin",  # Generic binary data
+    "db",
+    "sqlite",
+    "mdb",  # Database files
+    "dbf",
+    "myd",  # Database format files
+    # CAD and Specialized Technical Files
+    "dxf",
+    "dwg",  # AutoCAD files
+    "stl",
+    "obj",
+    "3ds",  # 3D model files
+    "blend",  # Blender 3D files
+    # Encrypted/Protected Files
+    "gpg",
+    "asc",
+    "pgp",  # Encrypted files
+    # Virtual Machine and Container Files
+    "vdi",
+    "vmdk",
+    "ova",  # Virtual machine disks
+    "docker",
+    "containerd",  # Container images
+    # Other Binary Formats
+    "class",  # Java class files
+    "o",
+    "a",  # Object and archive files
+    "lib",
+    "obj",  # Compiled library files
+    "ttf",
+    "otf",  # Font files
+    "fon",  # Windows font resource
+]
 
 
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+def is_forbidden_file(filename):
+    return (
+        "." in filename and filename.rsplit(".", 1)[1].lower() in FORBIDDEN_EXTENSIONS
+    )
 
 
 def convert_to_md(filepath: str) -> str:
@@ -51,7 +100,7 @@ def read_root():
 
 @app.post("/process_file")
 async def process_file(file: UploadFile = File(...)):
-    if not allowed_file(file.filename):
+    if is_forbidden_file(file.filename):
         return JSONResponse(content={"error": "File type not allowed"}, status_code=400)
 
     try:

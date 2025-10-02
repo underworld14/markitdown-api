@@ -108,6 +108,26 @@ The result should be a string encoding a JSON object like:
 { "markdown": "Your content written in markdown..." }
 ```
 
+Here's a very simple example in Python:
+
+```py
+import requests
+
+file_path = "/path/to/my.pdf"
+with open(file_path, 'rb') as file:
+    # Prepare the file for the multipart/form-data request
+    files = {'file': (file_path, file)}
+    
+    # Make the POST request to the API
+    response = requests.post("http://localhost:8490/process_file", files=files)
+    
+    # Parse the JSON response
+    result = response.json()
+    
+    # Return the markdown content
+    content = result.get('markdown')
+```
+
 ## Acknowledgments
 
 This project was originally based on [elbruno/MarkItDownServer](https://github.com/elbruno/MarkItDownServer) by Bruno Capuano.

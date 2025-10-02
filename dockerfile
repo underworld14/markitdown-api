@@ -41,4 +41,4 @@ COPY --chown=appuser:appuser . /app/
 # Make port available
 EXPOSE 8490
 
-CMD ["python", "./app.py"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8490"]
