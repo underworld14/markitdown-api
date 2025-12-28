@@ -10,13 +10,24 @@ This project is a lightweight REST API server built using FastAPI that receives 
 > [!NOTE]
 > This project uses `uv` for dependency management and multistage Docker builds, significantly reducing build times and final image size.
 
+> [!IMPORTANT]
+> **OpenAI API Key Required**: This API uses OpenAI GPT-4o for enhanced image descriptions. You MUST provide an `OPENAI_API_KEY` environment variable when running the container. The server will not start without it.
+
+## Prerequisites
+
+- Docker (for containerized deployment)
+- OpenAI API Key with access to GPT-4o model ([Get one here](https://platform.openai.com/api-keys))
+
 ## Using Pre-built Image
 
 The easiest way to get started is to use the pre-built image from GitHub Container Registry:
 
 ```bash
 docker pull ghcr.io/dezoito/markitdown-api:latest
-docker run -d --name markitdown-api -p 8490:8490 ghcr.io/dezoito/markitdown-api:latest
+docker run -d --name markitdown-api \
+  -p 8490:8490 \
+  -e OPENAI_API_KEY='your-openai-api-key-here' \
+  ghcr.io/dezoito/markitdown-api:latest
 ```
 
 ## Setup Instructions

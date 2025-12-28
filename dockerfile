@@ -41,4 +41,7 @@ COPY --chown=appuser:appuser . /app/
 # Make port available
 EXPOSE 8490
 
+# OPENAI_API_KEY must be provided at runtime via -e flag
+# Example: docker run -e OPENAI_API_KEY='sk-...' markitdown-api
+
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8490"]

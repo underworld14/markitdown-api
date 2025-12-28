@@ -5,14 +5,28 @@ import tempfile
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from markitdown import MarkItDown
+from openai import OpenAI
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Validate and initialize OpenAI client at startup
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    logger.error("CRITICAL: OPENAI_API_KEY environment variable is not set")
+    raise ValueError(
+        "OPENAI_API_KEY environment variable is required. "
+        "Set it before starting the server: export OPENAI_API_KEY='your-api-key'"
+    )
+
+logger.info("Initializing OpenAI client with gpt-4o model")
+openai_client = OpenAI(api_key=OPENAI_API_KEY)
+logger.info("OpenAI client initialized successfully")
+
 app = FastAPI(
     title="MarkItDown API Server",
-    description="API endpoint to extract text and convert it to markdown, using MarkItDown (https://github.com/microsoft/markitdown).",
+    description="API endpoint to extract text and convert it to markdown, using MarkItDown (https://github.com/microsoft/markitdown). Enhanced with OpenAI GPT-4o for image descriptions.",
 )
 
 
@@ -87,7 +101,8 @@ def is_forbidden_file(filename):
 
 def convert_to_md(filepath: str) -> str:
     logger.info(f"Converting file: {filepath}")
-    markitdown = MarkItDown()
+    # Initialize MarkItDown with OpenAI client for enhanced image descriptions
+    markitdown = MarkItDown(llm_client=openai_client, llm_model="gpt-4.1-mini")
     result = markitdown.convert(filepath)
     logger.info(f"Conversion result: {result.text_content[:100]}")
     return result.text_content
